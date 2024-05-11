@@ -8,6 +8,10 @@
 #include <QUrl>
 #include <QNetworkReply>
 #include <QEventLoop>
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
@@ -15,17 +19,25 @@ class Client {
 public:
     Client(const std::string& server, const std::string& path);
 
+    //QString extractedField;
+    QNetworkReply *reply;
     void connect();
-    //void onFinished();
-    //void send_request();
-    //std::string read_response();
+    QString read_response();
+    void processJson(const QString& jsonStr);
+    QString read_field();
+
+
+
 
 private:
 
+    QStringList string_array;
+    QByteArray responseData;
+    QString strReplyEdit;
+    //QString extractedField;
     QNetworkAccessManager manager;
     QNetworkRequest request;
     QEventLoop loop;
-
 
     std::string server_;
     std::string path_;

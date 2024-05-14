@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "client.h"
 #include <QTextEdit>
+#include <QDate>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,7 +19,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_2_clicked();
+    void on_startButton_clicked();
+
+    //void on_lineEdit_textChanged(const QString &arg1);
+
+    //void on_dateEdit_userDateChanged(const QDate &date);
+
+    void on_findButton_clicked();
 
 private:
     Ui::MainWindow *ui;

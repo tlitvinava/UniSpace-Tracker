@@ -14,47 +14,24 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_2">
+   <widget class="QPushButton" name="startButton">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>10</y>
-      <width>171</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Введите корпус</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
+      <x>550</x>
       <y>30</y>
-      <width>151</width>
+      <width>211</width>
       <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Магия апи</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>60</y>
-      <width>131</width>
-      <height>31</height>
-     </rect>
+     <string>Запуск программы</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>10</y>
+      <x>30</x>
+      <y>20</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -66,7 +43,7 @@
    <widget class="QDateEdit" name="dateEdit">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>30</x>
       <y>60</y>
       <width>121</width>
       <height>31</height>
@@ -76,7 +53,7 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>190</x>
       <y>10</y>
       <width>191</width>
       <height>41</height>
@@ -86,13 +63,26 @@
      <string>Введите аудиторию</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QPushButton" name="findButton">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>550</x>
+      <y>100</y>
+      <width>211</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Найти</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
       <y>60</y>
-      <width>181</width>
-      <height>31</height>
+      <width>171</width>
+      <height>30</height>
      </rect>
     </property>
    </widget>

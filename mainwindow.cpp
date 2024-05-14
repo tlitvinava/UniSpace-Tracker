@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     textEdit = new QTextEdit(this); // Инициализация textEdit
     textEdit->setGeometry(QRect(QPoint(100, 200), QSize(500, 300)));
-    client = new Client("iis.bsuir.by", "/api/v1/schedule?studentGroup=353504");//ЕСЛИ ТЫ УБЕРЕШЬ ЭТУ СТРОКУ ВСЕ УЛЕТИТ К ЧЕРТЯМ СОБАЧЬИМ
+    //client = new Client("iis.bsuir.by", "/api/v1/schedule?studentGroup=353504");//ЕСЛИ ТЫ УБЕРЕШЬ ЭТУ СТРОКУ ВСЕ УЛЕТИТ К ЧЕРТЯМ СОБАЧЬИМ
+    client = new Client("iis.bsuir.by", "/api/v1/auditories");
 }
 
 MainWindow::~MainWindow()
@@ -22,9 +23,22 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_startButton_clicked()
 {
-    client->connect();
-    this->textEdit->setText(client->read_field());
+    //client->connect();
+    client->connect_groups();
+    client->connect_group_schedule();
+}
+
+void MainWindow::on_findButton_clicked()
+{
+    // Получаем номер аудитории из lineEdit
+    QString auditoriumNumber = ui->lineEdit->text();
+
+    // Получаем выбранную дату из dateEdit
+    QDate date = ui->dateEdit->date();
+
+    // Вызываем функцию поиска расписания с полученными данными
+    this->textEdit->setText(client->findScheduleAsString(auditoriumNumber, date));
 }
 

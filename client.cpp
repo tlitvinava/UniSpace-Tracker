@@ -8,7 +8,7 @@ Client::Client(const std::string& server, const std::string& path) : server_(ser
 
 }
 
-/*void Client::connect() {//ПОЛУЧЕНИЕ ВСЕХ АУДИТОРИЙ
+void Client::connect() {//ПОЛУЧЕНИЕ ВСЕХ АУДИТОРИЙ
 
     request.setUrl(QUrl("https://iis.bsuir.by/api/v1/auditories"));
 
@@ -20,7 +20,7 @@ Client::Client(const std::string& server, const std::string& path) : server_(ser
     loop.exec();
 
     responseData = reply->readAll();
-    //qDebug() << responseData;
+    qDebug() << responseData;
 
     QString strReply = QString::fromUtf8(responseData);
     strReplyEdit = strReply;
@@ -44,7 +44,8 @@ void Client::processJson(const QString& jsonStr) {//СОРТИРОВКА АУД�
         i.next();
         qDebug() << "Building: " << i.key() << ", Rooms: " << i.value().join(", ");
     }
-}*/
+}
+
 
 void Client::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В УНИВЕРЕ
     //request.setUrl(QUrl("https://iis.bsuir.by/api/v1/schedule?studentGroup=353504"));
@@ -65,14 +66,18 @@ void Client::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В УН�
     processJsonGroup(strReplyEditGroup);
 }
 
-void Client::processJsonGroup(const QString& jsonStr) {//ПОЛУЧЕНИЕ ПОЛЯ НОМЕР ГРУППЫ И СОХРАНЕНИЕ В МАССИВ
+void Client::processJsonGroup(const QString& jsonStr) {// ПОЛУЧЕНИЕ ПОЛЯ НОМЕР ГРУППЫ И СОХРАНЕНИЕ В МАССИВ
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonArray array = doc.array();
 
     for (int i = 0; i < array.size(); ++i) {
         QJsonObject object = array[i].toObject();
         QJsonValue needed_field = object.value("name");
-        string_array_group.append(needed_field.toString());
+        QString groupNumber = needed_field.toString();
+        // Проверка, что номер группы не начинается с нуля
+        if (!groupNumber.startsWith('0')) {
+            string_array_group.append(groupNumber);
+        }
     }
 }
 
@@ -106,6 +111,62 @@ void Client::connect_group_schedule() {//ПОЛУЧЕНИЕ РАСПИСАНИЯ
 }
 
 void Client::processGroupSchedule(const QString& jsonStr) {
+    QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+    QJsonObject object = doc.object();
+    QJsonValue schedules_field = object.value("schedules");
+
+    if (schedules_field.isObject()) {
+        QJsonObject schedules_object = schedules_field.toObject();
+        QMap<QString, QStringList> daySchedules;
+        QSet<QString> uniqueSchedules; // Добавлено для проверки уникальности
+        QStringList daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
+
+        for (const QString& day : daysOfWeek) {
+            QJsonValue day_field = schedules_object.value(day);
+            if (day_field.isArray()) {
+                QJsonArray day_array = day_field.toArray();
+
+                for (const QJsonValue& dayValue : day_array) {
+                    if (dayValue.isObject()) {
+                        QJsonObject dayObject = dayValue.toObject();
+                        QString auditorium = dayObject.value("auditories").toArray().first().toString();
+                        QString startLessonTime = QTime::fromString(dayObject.value("startLessonTime").toString(), "HH:mm").toString("HH:mm:ss");
+                        QString endLessonTime = QTime::fromString(dayObject.value("endLessonTime").toString(), "HH:mm").toString("HH:mm:ss");
+                        QJsonArray weekNumberArray = dayObject.value("weekNumber").toArray();
+                        QStringList weekNumbers;
+                        for (const QJsonValue& value : weekNumberArray) {
+                            weekNumbers.append(QString::number(value.toInt()));
+                        }
+                        QString weekNumbersString = weekNumbers.join(", ");
+
+                        QString scheduleString = QString("\"%1\"+\"%2\"+\"%3\"+\"%4\"")
+                                                     .arg(auditorium)
+                                                     .arg(startLessonTime)
+                                                     .arg(endLessonTime)
+                                                     .arg(weekNumbersString);
+                        // Проверка на уникальность перед добавлением
+                        if (!uniqueSchedules.contains(scheduleString)) {
+                            uniqueSchedules.insert(scheduleString);
+                            daySchedules[day].append(scheduleString);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (const QString& day : daysOfWeek) {
+            if (!daySchedules[day].isEmpty()) {
+                qDebug() << day << " :";
+                for (const QString& schedule : daySchedules[day]) {
+                    qDebug() << "    " << schedule;
+                }
+            }
+        }
+    }
+}
+
+
+/*void Client::processGroupSchedule(const QString& jsonStr) {
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonObject object = doc.object();
     QJsonValue schedules_field = object.value("schedules");
@@ -153,7 +214,9 @@ void Client::processGroupSchedule(const QString& jsonStr) {
             }
         }
     }
-}
+}*/
+
+
 
 QString Client::findScheduleAsString(const QString& auditoriumNumber, const QDate& date) {
     QString result;
@@ -207,6 +270,18 @@ QStringList Client::read_auditoriums() {
     // Возвращаем QStringList с аудиториями
     return auditoriums;
 }
+
+/*void Client::processJsonGroup(const QString& jsonStr) {//ПОЛУЧЕНИЕ ПОЛЯ НОМЕР ГРУППЫ И СОХРАНЕНИЕ В МАССИВ
+    QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+    QJsonArray array = doc.array();
+
+    for (int i = 0; i < array.size(); ++i) {
+        QJsonObject object = array[i].toObject();
+        QJsonValue needed_field = object.value("name");
+        string_array_group.append(needed_field.toString());
+    }
+}*/
+
 
 /*Неделя:
     День недели:

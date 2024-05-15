@@ -20,9 +20,9 @@ public:
     Client(const std::string& server, const std::string& path);
 
     QNetworkReply *reply;
-    //void connect();
+    void connect();
     QString read_response();
-    //void processJson(const QString& jsonStr);
+    void processJson(const QString& jsonStr);
     QString read_field();
     void onLineEditTextChanged(const QString& text);
     void connect_groups();
@@ -37,7 +37,6 @@ public:
 
     //void connect_group_schedule353504();
     //void processGroupSchedule353504(const QString& jsonStr);
-
 
 private:
 

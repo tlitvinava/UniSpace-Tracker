@@ -25,7 +25,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_startButton_clicked()
 {
-    //client->connect();
+    client->connect();
     client->connect_groups();
     client->connect_group_schedule();
 }

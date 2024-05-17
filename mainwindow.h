@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    QTextEdit *textEdit;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -30,7 +31,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Client *client;
-    QTextEdit *textEdit;
+    //QTextEdit *textEdit;
 };
 
 #endif // MAINWINDOW_H

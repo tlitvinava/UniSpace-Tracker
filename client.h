@@ -19,10 +19,12 @@ class Client {
 public:
     Client(const std::string& server, const std::string& path);
 
+    QMap<QString, QSet<QString>> finalSchedule;
+    QMap<QString, QStringList> daySchedules;
     QNetworkReply *reply;
     void connect();
     QString read_response();
-    void processJson(const QString& jsonStr);
+    //void processJson(const QString& jsonStr);
     QString read_field();
     void onLineEditTextChanged(const QString& text);
     void connect_groups();
@@ -34,13 +36,21 @@ public:
     void processGroupSchedule(const QString& jsonStr);
     QStringList read_auditoriums();
     QString findScheduleAsString(const QString& auditoriumNumber, const QDate& date);
+    void createFinalSchedule();
+    QStringList findTimeSlots(const QMap<QString, QSet<QString>>& scheduleMap, const QString& auditorium, const QDate& date);
+    QString formatTimeSlots(const QStringList& timeSlots);
+    QString searchSchedule(const QString& auditoriumNumber, const QDate& date);
+    QString getDayOfWeekString(const QDate& date);
+    QString findScheduleTime(const QMap<QString, QSet<QString>>& finalSchedule, const QString& auditorium, const QDate& date);
+
+    //void searchSchedule();
 
     //void connect_group_schedule353504();
     //void processGroupSchedule353504(const QString& jsonStr);
 
 private:
 
-    QMap<QString, QStringList> daySchedules;
+    //QMap<QString, QStringList> daySchedules;
     QStringList auditoriums;
     QMap<QString, QStringList> buildingRooms;
     QStringList string_array;

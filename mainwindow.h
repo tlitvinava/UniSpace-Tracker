@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "client.h"
+#include "apimanager.h"
 #include <QTextEdit>
 #include <QDate>
 
@@ -30,7 +30,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    Client *client;
+    ApiManager *apimanager;
     //QTextEdit *textEdit;
 };
 

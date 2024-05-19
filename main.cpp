@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 
     try {
         MainWindow w;
+        w.setWindowTitle("Добро пожаловать!");
         w.show();
         return a.exec();
     } catch (const std::exception &e) {

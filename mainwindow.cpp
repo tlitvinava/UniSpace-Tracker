@@ -4,6 +4,8 @@
 #include <iostream>
 #include<QLabel>
 #include <QPushButton>
+#include <QProgressDialog>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,13 +25,25 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_startButton_clicked()
+    void MainWindow::on_startButton_clicked()
 {
-    //client->connect();
-    apimanager->connect_groups();
-    apimanager->connect_group_schedule();
-    apimanager->createFinalSchedule();
-}
+        /*QProgressDialog progressDialog(this);
+        progressDialog.setLabelText(tr("Загрузка данных..."));
+        progressDialog.setCancelButtonText(tr("Отмена"));
+        progressDialog.setRange(0, 100);
+        progressDialog.setAutoClose(true);
+
+        connect(apimanager, &ApiManager::progressUpdated, &progressDialog, &QProgressDialog::setValue);
+
+        progressDialog.show();*/
+
+        apimanager->connect_groups();
+        apimanager->connect_group_schedule();
+        apimanager->createFinalSchedule();
+
+        //connect(apimanager, &ApiManager::finished, &progressDialog, &QProgressDialog::accept);
+
+    }
 
 void MainWindow::on_findButton_clicked() {
     QString auditoriumNumber = ui->lineEdit->text();

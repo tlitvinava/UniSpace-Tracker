@@ -11,7 +11,9 @@ static QStringList daysOfWeek = {"Понедельник", "Вторник", "С
 ApiManager::ApiManager(const std::string& server, const std::string& path) : server_(server), path_(path), io_service_(), context_(boost::asio::ssl::context::sslv23), socket_(io_service_, context_){}
 
 void ApiManager::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В УНИВЕРЕ
-    //request.setUrl(QUrl("https://iis.bsuir.by/api/v1/schedule?studentGroup=353504"));
+
+    //emit progressUpdated(20); // Обновление прогресса на 20%
+
     request.setUrl(QUrl("https://iis.bsuir.by/api/v1/student-groups"));
 
     // отправляем GET-запрос и получаем ответ
@@ -30,6 +32,9 @@ void ApiManager::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В �
 }
 
 void ApiManager::processJsonGroup(const QString& jsonStr) {// ПОЛУЧЕНИЕ ПОЛЯ НОМЕР ГРУППЫ И СОХРАНЕНИЕ В МАССИВ
+
+    //emit progressUpdated(40); // Обновление прогресса на 40%
+
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonArray array = doc.array();
 
@@ -47,6 +52,9 @@ void ApiManager::processJsonGroup(const QString& jsonStr) {// ПОЛУЧЕНИЕ
 }
 
 void ApiManager::connect_group_schedule() {//ПОЛУЧЕНИЕ РАСПИСАНИЯ КАЖДОЙ ГРУППЫ           (РАБОЧАЯ ВЕРСИЯ)
+
+    //emit progressUpdated(60); // Обновление прогресса на 60%
+
 
     // Проходим по всем группам в массиве string_array_group
     for (const QString& groupNumber : string_array_group) {
@@ -88,15 +96,16 @@ void ApiManager::connect_group_schedule() {//ПОЛУЧЕНИЕ РАСПИСАН
 
 void ApiManager::processGroupSchedule(const QString& jsonStr) {
     //QMutexLocker locker(&mutex);
+
+    //emit progressUpdated(80); // Обновление прогресса на 80%
+
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonObject object = doc.object();
     QJsonValue schedules_field = object.value("schedules");
 
     if (schedules_field.isObject()) {
         QJsonObject schedules_object = schedules_field.toObject();
-        //QMap<QString, QStringList> daySchedules;
         QSet<QString> uniqueSchedules; // Добавлено для проверки уникальности
-        //QStringList daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
 
         for (const QString& day : daysOfWeek) {
             QJsonValue day_field = schedules_object.value(day);
@@ -106,30 +115,39 @@ void ApiManager::processGroupSchedule(const QString& jsonStr) {
                 for (const QJsonValue& dayValue : day_array) {
                     if (dayValue.isObject()) {
                         QJsonObject dayObject = dayValue.toObject();
-                        QString auditorium = dayObject.value("auditories").toArray().first().toString();
-                        QString startLessonTime = QTime::fromString(dayObject.value("startLessonTime").toString(), "HH:mm").toString("HH:mm");
-                        QString endLessonTime = QTime::fromString(dayObject.value("endLessonTime").toString(), "HH:mm").toString("HH:mm");
-                        QJsonArray weekNumberArray = dayObject.value("weekNumber").toArray();
-                        QStringList weekNumbers;
-                        for (const QJsonValue& value : weekNumberArray) {
-                            weekNumbers.append(QString::number(value.toInt()));
-                        }
-                        QString weekNumbersString = weekNumbers.join(", ");
-
-                        QString scheduleString = auditorium + "+" + startLessonTime + "+" + endLessonTime + "+" + weekNumbersString;
-                        // Проверка на уникальность перед добавлением
-                        if (!uniqueSchedules.contains(scheduleString)) {//mutex
-                            uniqueSchedules.insert(scheduleString);
-                            daySchedules[day].append(scheduleString);
-                        }
+                        processDayObject(dayObject, day);
                     }
                 }
+
             }
         }
     }
 }
 
+void ApiManager::processDayObject(const QJsonObject& dayObject, const QString& day) {
+    QString auditorium = dayObject.value("auditories").toArray().first().toString();
+    QString startLessonTime = QTime::fromString(dayObject.value("startLessonTime").toString(), "HH:mm").toString("HH:mm");
+    QString endLessonTime = QTime::fromString(dayObject.value("endLessonTime").toString(), "HH:mm").toString("HH:mm");
+    QJsonArray weekNumberArray = dayObject.value("weekNumber").toArray();
+    QStringList weekNumbers;
+    for (const QJsonValue& value : weekNumberArray) {
+        weekNumbers.append(QString::number(value.toInt()));
+    }
+    QString weekNumbersString = weekNumbers.join(", ");
+
+    QString scheduleString = auditorium + "+" + startLessonTime + "+" + endLessonTime + "+" + weekNumbersString;
+    // Проверка на уникальность перед добавлением
+    if (!uniqueSchedules.contains(scheduleString)) {
+        uniqueSchedules.insert(scheduleString);
+        daySchedules[day].append(scheduleString);
+    }
+}
+
+
+
 void ApiManager::createFinalSchedule() {  //                    (РАБОТАЕТ)
+
+    //emit progressUpdated(100); // Обновление прогресса на 100%
 
     for (const QString& day : daysOfWeek) {
         for (const QString& schedule : daySchedules[day]) {
@@ -162,6 +180,8 @@ void ApiManager::createFinalSchedule() {  //                    (РАБОТАЕ�
         qDebug() << line;
     }
     qDebug()<<"Создана финальная карта";
+    //Semit finished(); // Сигнал о завершении процесса
+
 }
 
 QString ApiManager::getDayOfWeekString(const QDate& date) {

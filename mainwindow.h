@@ -5,6 +5,8 @@
 #include "apimanager.h"
 #include <QTextEdit>
 #include <QDate>
+#include "anothercontroller.h"
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

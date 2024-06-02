@@ -22,11 +22,13 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
-class ApiManager {
+class ApiManager{
 public:
     ApiManager(const std::string& server, const std::string& path);
 
     //QMap<QString, QSet<std::pair<QTime, QTime>>> finalSchedule;
+
+    QSet<QString> uniqueSchedules;
 
     QMap<QString, QSet<QString>> finalSchedule;
     QMap<QString, QStringList> daySchedules;
@@ -42,7 +44,10 @@ public:
     QString read_group();
     void connect_group_schedule();
     QStringList read_group_schedule();
-    void processGroupSchedule(const QString& jsonStr);
+    void processGroupSchedule(const QString& jsonStr){
+         QThread::sleep(1);
+    }
+    void processDayObject(const QJsonObject& dayObject, const QString& day);
     QStringList read_auditoriums();
     QString findScheduleAsString(const QString& auditoriumNumber, const QDate& date);
     void createFinalSchedule();
@@ -82,6 +87,14 @@ private:
     boost::asio::io_service io_service_;
     boost::asio::ssl::context context_;
     boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_;
+
+signals:
+    void progressUpdated(int value);
+    void finished();
+
+public slots:
+    void startProcess();
+
 };
 
 #endif // APIMANAGER_H

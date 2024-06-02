@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     //textEdit->setGeometry(QRect(QPoint(100, 200), QSize(500, 300)));
     //client = new Client("iis.bsuir.by", "/api/v1/schedule?studentGroup=353504");//ЕСЛИ ТЫ УБЕРЕШЬ ЭТУ СТРОКУ ВСЕ УЛЕТИТ
     apimanager = new ApiManager("iis.bsuir.by", "/api/v1/auditories");
+    apimanager->apimanager=apimanager;
 }
 
 MainWindow::~MainWindow()
@@ -25,25 +26,12 @@ MainWindow::~MainWindow()
 }
 
 
-    void MainWindow::on_startButton_clicked()
+void MainWindow::on_startButton_clicked()
 {
-        /*QProgressDialog progressDialog(this);
-        progressDialog.setLabelText(tr("Загрузка данных..."));
-        progressDialog.setCancelButtonText(tr("Отмена"));
-        progressDialog.setRange(0, 100);
-        progressDialog.setAutoClose(true);
-
-        connect(apimanager, &ApiManager::progressUpdated, &progressDialog, &QProgressDialog::setValue);
-
-        progressDialog.show();*/
-
-        apimanager->connect_groups();
-        apimanager->connect_group_schedule();
-        apimanager->createFinalSchedule();
-
-        //connect(apimanager, &ApiManager::finished, &progressDialog, &QProgressDialog::accept);
-
-    }
+    apimanager->connect_groups();
+    apimanager->connect_group_schedule();
+    apimanager->createFinalSchedule();
+}
 
 void MainWindow::on_findButton_clicked() {
     QString auditoriumNumber = ui->lineEdit->text();

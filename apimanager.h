@@ -18,6 +18,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
 #include <functional>
+#include "HelloWorldTask.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -25,6 +26,7 @@
 class ApiManager{
 public:
     ApiManager(const std::string& server, const std::string& path);
+    ApiManager *apimanager;
 
     //QMap<QString, QSet<std::pair<QTime, QTime>>> finalSchedule;
 
@@ -34,36 +36,19 @@ public:
     QMap<QString, QStringList> daySchedules;
     QNetworkReply *reply;
     void connect();
-    QString read_response();
-    //void processJson(const QString& jsonStr);
-    QString read_field();
-    void onLineEditTextChanged(const QString& text);
+    QString getResponse(QString groupNumber);
     void connect_groups();
-    QString read_response_groups();
     void processJsonGroup(const QString& jsonStr);
-    QString read_group();
     void connect_group_schedule();
-    QStringList read_group_schedule();
-    void processGroupSchedule(const QString& jsonStr){
-         QThread::sleep(1);
-    }
+    void processGroupSchedule(const QString& jsonStr);
     void processDayObject(const QJsonObject& dayObject, const QString& day);
-    QStringList read_auditoriums();
-    QString findScheduleAsString(const QString& auditoriumNumber, const QDate& date);
+    void processResult(QString groupNumber);
     void createFinalSchedule();
     QStringList findTimeSlots(const QMap<QString, QSet<QString>>& scheduleMap, const QString& auditorium, const QDate& date);
-    QString formatTimeSlots(const QStringList& timeSlots);
-    QString searchSchedule(const QString& auditoriumNumber, const QDate& date);
     QString getDayOfWeekString(const QDate& date);
     QString findScheduleTime(const QMap<QString, QSet<QString>>& finalSchedule, const QString& auditorium, const QDate& date);
     QStringList findFreeTimeSlots(const QMap<QString, QSet<QString>>& finalSchedule, const QString& auditorium, const QDate& date);
-    //QStringList findFreeTimeSlots(const QMap<QString, QSet<QPair<QTime, QTime>>>& finalSchedule, const QString& auditorium, const QDate& date);
     static bool timeCompare(const QPair<QTime, QTime>& a, const QPair<QTime, QTime>& b);
-
-
-
-
-    //void searchSchedule();
 
 private:
 

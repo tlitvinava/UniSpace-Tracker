@@ -1,4 +1,6 @@
 #include "apimanager.h"
+#include "HelloWorldTask.cpp"
+
 
 #include <iostream>
 #include <boost/property_tree/ptree.hpp>
@@ -32,9 +34,6 @@ void ApiManager::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В �
 }
 
 void ApiManager::processJsonGroup(const QString& jsonStr) {// ПОЛУЧЕНИЕ ПОЛЯ НОМЕР ГРУППЫ И СОХРАНЕНИЕ В МАССИВ
-
-    //emit progressUpdated(40); // Обновление прогресса на 40%
-
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonArray array = doc.array();
 
@@ -49,56 +48,67 @@ void ApiManager::processJsonGroup(const QString& jsonStr) {// ПОЛУЧЕНИЕ
     }
     qDebug()<<"Группа сохранена в массив";
 
+    //string_array_group.append("353504");
 }
 
 void ApiManager::connect_group_schedule() {//ПОЛУЧЕНИЕ РАСПИСАНИЯ КАЖДОЙ ГРУППЫ           (РАБОЧАЯ ВЕРСИЯ)
+    QThreadPool *threadPool = QThreadPool::globalInstance();
+    threadPool->setMaxThreadCount(8);
+    qDebug() << "!Начало для потоков:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-    //emit progressUpdated(60); // Обновление прогресса на 60%
-
-
-    // Проходим по всем группам в массиве string_array_group
     for (const QString& groupNumber : string_array_group) {
-        // Формируем URL для запроса, добавляя номер группы к базовому URL
-        QString url = QString("https://iis.bsuir.by/api/v1/schedule?studentGroup=%1").arg(groupNumber);
-        request.setUrl(QUrl(url));
-
-        qDebug() << "Начало:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
-
-        // Отправляем GET-запрос и получаем ответ
-        reply = manager.get(request);
-
-        // Ожидаем завершения запроса
-        QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-        loop.exec();
-
-        // Проверяем, была ли ошибка в запросе
-        if (reply->error() != QNetworkReply::NoError) {
-            qDebug() << "Ошибка: " << reply->errorString();
-            continue;
-        }
-
-        // Получаем данные ответа
-        responseData = reply->readAll();
-
-        qDebug() << "Конец_:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
-
-        qDebug()<<"Получено расписание группы";
-
-
-        // Сохраняем данные ответа в отдельный массив
-        processGroupSchedule(QString::fromUtf8(responseData));
-        qDebug()<<"Получены поля из расписания группы";
+        HelloWorldTask *task = new HelloWorldTask(groupNumber, apimanager);
+        threadPool->start(task);
     }
-    qDebug()<<"Получен список, сортирующийся по дням недели";
-
+    threadPool->waitForDone();
+    qDebug() << "!Конец для потоков:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qDebug()<<"Запросы расписания групп выполнены";
 }
 
+QString ApiManager::getResponse(QString groupNumber) {
+    QString url = QString("https://iis.bsuir.by/api/v1/schedule?studentGroup=%1").arg(groupNumber);
+    request.setUrl(QUrl(url));
+
+    qDebug() << "Начало:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+
+    // Создаем QNetworkAccessManager
+    QNetworkAccessManager manager;
+
+    // Отправляем GET-запрос и получаем ответ
+    QNetworkReply* reply = manager.get(request);
+
+    // Создаем цикл событий для ожидания завершения запроса
+    QEventLoop loop;
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    // Проверяем, была ли ошибка в запросе
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "Ошибка: " << reply->errorString();
+        return "";
+    }
+
+    // Получаем данные ответа
+    QByteArray responseData = reply->readAll();
+
+    qDebug() << "Конец_:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
+
+    qDebug() << "Получено расписание группы";
+    return QString::fromUtf8(responseData);
+}
+
+// Синхронизированный метод processResult
+void ApiManager::processResult(QString requestResult) {
+    QMutexLocker locker(&mutex); // Блокировка для потокобезопасного доступа
+    // ... ваш код для обработки результатов ...
+    if(requestResult==""){
+        return;
+    }
+    //qDebug() << "Processing result: " << requestResult;
+    processGroupSchedule(requestResult);
+}
 
 void ApiManager::processGroupSchedule(const QString& jsonStr) {
-    //QMutexLocker locker(&mutex);
-
-    //emit progressUpdated(80); // Обновление прогресса на 80%
-
     QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
     QJsonObject object = doc.object();
     QJsonValue schedules_field = object.value("schedules");

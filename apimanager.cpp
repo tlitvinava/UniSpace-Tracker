@@ -10,7 +10,8 @@
 static QStringList daysOfWeek = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
 
 
-ApiManager::ApiManager(const std::string& server, const std::string& path) : server_(server), path_(path), io_service_(), context_(boost::asio::ssl::context::sslv23), socket_(io_service_, context_){}
+ApiManager::ApiManager(const std::string& server, const std::string& path) :
+    server_(server), path_(path), io_service_(), context_(boost::asio::ssl::context::sslv23), socket_(io_service_, context_){}
 
 void ApiManager::connect_groups() {//ПОЛУЧЕНИЕ ВСЕХ ГРУПП В УНИВЕРЕ
 
@@ -207,6 +208,20 @@ QString ApiManager::getDayOfWeekString(const QDate& date) {
     return daysOfWeek[date.dayOfWeek()];
 }
 
+QString ApiManager::checkDate(const QDate& date) {
+    QDate currentDate = QDate::currentDate();
+    QDate endDate(2024, 6, 7); // 7 июня 2024 года
+
+    if (date < currentDate) {
+        return "Эта дата уже прошла";
+    } else if (date > endDate) {
+        return "Занятия заканчиваются 7 июня 2024 года";
+    } else {
+        return ""; // Дата в допустимом диапазоне
+    }
+}
+
+
 QString ApiManager::findScheduleTime(const QMap<QString, QSet<QString>>& finalSchedule, const QString& auditorium, const QDate& date) {
     QString dayOfWeek = getDayOfWeekString(date);
 
@@ -233,6 +248,10 @@ QStringList ApiManager::findFreeTimeSlots(const QMap<QString, QSet<QString>>& fi
     if (dayOfWeek == "Воскресенье") {
         qDebug() << "Университет не работает в воскресенье";
         return freeTimeSlots; // Возвращаем пустой список
+    }
+
+    if (dayOfWeek == "Суббота") {
+        endTime = QTime(18, 0);
     }
 
     QString key = auditorium + "+" + dayOfWeek;

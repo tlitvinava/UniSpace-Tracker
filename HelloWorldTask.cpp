@@ -13,7 +13,7 @@ public:
 
     void run() override
     {
-        qDebug() << "Hello world from thread" << QThread::currentThread() << "with group number" << groupNumber;
+        //qDebug() << "Hello world from thread" << QThread::currentThread() << "with group number" << groupNumber;
         QString response = apiManager->getResponse(groupNumber);
         apiManager->processResult(response);
     }

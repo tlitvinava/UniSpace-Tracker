@@ -40,6 +40,7 @@ public:
     void connect_groups();
     void processJsonGroup(const QString& jsonStr);
     void connect_group_schedule();
+    QString checkDate(const QDate& date);
     void processGroupSchedule(const QString& jsonStr);
     void processDayObject(const QJsonObject& dayObject, const QString& day);
     void processResult(QString groupNumber);

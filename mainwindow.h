@@ -33,6 +33,7 @@ private:
     Ui::MainWindow *ui;
     ApiManager *apimanager;
     //QTextEdit *textEdit;
+
 };
 
 #endif // MAINWINDOW_H

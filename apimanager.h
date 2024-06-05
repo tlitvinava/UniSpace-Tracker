@@ -18,7 +18,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
 #include <functional>
-#include "HelloWorldTask.h"
+#include "ThreadManager.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>

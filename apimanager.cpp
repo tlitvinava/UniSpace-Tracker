@@ -1,5 +1,5 @@
 #include "apimanager.h"
-#include "HelloWorldTask.cpp"
+#include "ThreadManager.cpp"
 
 
 #include <iostream>
@@ -58,7 +58,7 @@ void ApiManager::connect_group_schedule() {//ПОЛУЧЕНИЕ РАСПИСАН
     qDebug() << "!Начало для потоков:" << QDateTime::currentDateTime().toMSecsSinceEpoch();
 
     for (const QString& groupNumber : string_array_group) {
-        HelloWorldTask *task = new HelloWorldTask(groupNumber, apimanager);
+        ThreadManager *task = new ThreadManager(groupNumber, apimanager);
         threadPool->start(task);
     }
     threadPool->waitForDone();
@@ -158,7 +158,7 @@ void ApiManager::processDayObject(const QJsonObject& dayObject, const QString& d
 
 void ApiManager::createFinalSchedule() {  //                    (РАБОТАЕТ)
 
-    //emit progressUpdated(100); // Обновление прогресса на 100%
+    finalSchedule.clear();
 
     for (const QString& day : daysOfWeek) {
         for (const QString& schedule : daySchedules[day]) {

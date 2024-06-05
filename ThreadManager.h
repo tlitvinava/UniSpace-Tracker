@@ -1,5 +1,5 @@
-/*#ifndef HELLOWORLDTASK_H
-#define HELLOWORLDTASK_H
+/*#ifndef THREADMANAGER_H
+#define THREADMANAGER_H
 
 #include <QThread>
 
@@ -13,5 +13,5 @@ private:
     QString groupNumber_;
 };
 
-#endif // HELLOWORLDTASK_H
+#endif // THREADMANAGER_H
 */

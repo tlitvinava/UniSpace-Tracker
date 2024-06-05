@@ -6,6 +6,8 @@
 #include <QTextEdit>
 #include <QDate>
 #include <QThread>
+#include <QPropertyAnimation>
+#include <QMovie>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,12 +24,8 @@ public:
 
 private slots:
     void on_startButton_clicked();
-
-    //void on_lineEdit_textChanged(const QString &arg1);
-
-    //void on_dateEdit_userDateChanged(const QDate &date);
-
     void on_findButton_clicked();
+    void hideStatusLabel();
 
 private:
     Ui::MainWindow *ui;

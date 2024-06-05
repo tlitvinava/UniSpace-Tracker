@@ -25,7 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
     apimanager = new ApiManager("iis.bsuir.by", "/api/v1/auditories");
     apimanager->apimanager=apimanager;
 
-    on_startButton_clicked();
+
+    apimanager->connect_groups();
+    apimanager->connect_group_schedule();
+    apimanager->createFinalSchedule();
+
+    //on_startButton_clicked();
 }
 
 MainWindow::~MainWindow()
@@ -36,14 +41,40 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_startButton_clicked()
 {
-    qDebug()<<"lrglsorjhdlnvd;nb";
+    ui->statusLabel->setText("Пожалуйста подождите...");
+
+    // QMovie *movie = new QMovie("/home/taisa/Загрузки/gufdi..gif"); // Замените путь на свой файл
+    // ui->label_2->setMovie(movie);
+
+    // // Запускаем анимацию
+    // movie->start();
+
     apimanager->connect_groups();
     apimanager->connect_group_schedule();
     apimanager->createFinalSchedule();
+    ui->statusLabel->setText("Данные обновлены");
+
+    QTimer::singleShot(5000, this, SLOT(hideStatusLabel()));
+
+    QPropertyAnimation *animation = new QPropertyAnimation(ui->statusLabel, "windowOpacity");
+    animation->setDuration(10000); // Продолжительность анимации в миллисекундах
+    animation->setStartValue(1.0); // Начальное значение прозрачности (полностью видимый)
+    animation->setEndValue(0.0);   // Конечное значение прозрачности (полностью невидимый)
+
+    // Подключить слот для завершения анимации
+    connect(animation, &QPropertyAnimation::finished, this, &MainWindow::hideStatusLabel);
+
+    // Запустить анимацию
+    animation->start();
+}
+
+void MainWindow::hideStatusLabel()
+{
+    ui->statusLabel->clear();
+
 }
 
 void MainWindow::on_findButton_clicked() {
-    qDebug()<<"lrglsorjhdlnvd;nb";
     QString auditoriumNumber = ui->lineEdit->text();
     QDate date = ui->dateEdit->date();
 

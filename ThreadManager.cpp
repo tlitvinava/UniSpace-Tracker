@@ -3,13 +3,13 @@
 #include <QThread>
 #include "apimanager.h"
 
-class HelloWorldTask : public QRunnable
+class ThreadManager : public QRunnable
 {
     QString groupNumber;
     ApiManager* apiManager; // Указатель на объект ApiManager
 
 public:
-    HelloWorldTask(QString groupNum, ApiManager* apiManag) : groupNumber(groupNum), apiManager(apiManag) {}
+    ThreadManager(QString groupNum, ApiManager* apiManag) : groupNumber(groupNum), apiManager(apiManag) {}
 
     void run() override
     {
